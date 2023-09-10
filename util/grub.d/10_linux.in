@@ -61,6 +61,9 @@ if ( [ "x${GRUB_DEVICE_UUID}" = "x" ] && [ "x${GRUB_DEVICE_PARTUUID}" = "x" ] ) 
 elif [ "x${GRUB_DEVICE_UUID}" = "x" ] \
     || [ "x${GRUB_DISABLE_LINUX_UUID}" = "xtrue" ]; then
   LINUX_ROOT_DEVICE=PARTUUID=${GRUB_DEVICE_PARTUUID}
+elif [ "x${GRUB_DISABLE_LINUX_UUID}" = "xLABEL" ] \
+    && [ -b "/dev/disk/by-label/$(blkid -l -t UUID=${GRUB_DEVICE_UUID} -s LABEL -o value)" ]; then
+  LINUX_ROOT_DEVICE=LABEL="$(blkid -l -t UUID=${GRUB_DEVICE_UUID} -s LABEL -o value)"
 else
   LINUX_ROOT_DEVICE=UUID=${GRUB_DEVICE_UUID}
 fi

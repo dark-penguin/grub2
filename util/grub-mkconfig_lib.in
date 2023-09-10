@@ -158,14 +158,22 @@ prepare_grub_to_access_device ()
   fi
   if [ "x${GRUB_DISABLE_UUID}" != "xtrue" ] && fs_uuid="`"${grub_probe}" --device $@ --target=fs_uuid 2> /dev/null`" ; then
     hints="`"${grub_probe}" --device $@ --target=hints_string 2> /dev/null`" || hints=
+
+    if [ "x${GRUB_DISABLE_LINUX_UUID}" = "xLABEL" ] \
+        && [ -b "/dev/disk/by-label/$(blkid -l -t UUID=${fs_uuid} -s LABEL -o value)" ]; then
+      device="--label $(blkid -l -t UUID=${fs_uuid} -s LABEL -o value)"
+    else
+      device="--fs-uuid ${fs_uuid}"
+    fi
+
     if [ "x$hints" != x ]; then
       echo "if [ x\$feature_platform_search_hint = xy ]; then"
-      echo "  search --no-floppy --fs-uuid --set=root ${hints} ${fs_uuid}"
+      echo "  search --no-floppy --set=root ${hints} ${device}"
       echo "else"
-      echo "  search --no-floppy --fs-uuid --set=root ${fs_uuid}"
+      echo "  search --no-floppy --set=root ${device}"
       echo "fi"
     else
-      echo "search --no-floppy --fs-uuid --set=root ${fs_uuid}"
+      echo "search --no-floppy --set=root ${device}"
     fi
   fi
   IFS="$old_ifs"
