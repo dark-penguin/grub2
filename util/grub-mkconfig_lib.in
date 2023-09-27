@@ -159,7 +159,7 @@ prepare_grub_to_access_device ()
   if [ "x${GRUB_DISABLE_UUID}" != "xtrue" ] && fs_uuid="`"${grub_probe}" --device $@ --target=fs_uuid 2> /dev/null`" ; then
     hints="`"${grub_probe}" --device $@ --target=hints_string 2> /dev/null`" || hints=
 
-    if [ "x${GRUB_DISABLE_LINUX_UUID}" = "xLABEL" ] \
+    if [ "x${GRUB_ENABLE_LINUX_LABEL}" = "xtrue" ] \
         && [ -b "/dev/disk/by-label/$(blkid -l -t UUID=${fs_uuid} -s LABEL -o value)" ]; then
       device="--label $(blkid -l -t UUID=${fs_uuid} -s LABEL -o value)"
     else
